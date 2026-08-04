@@ -37,17 +37,19 @@
 }
 
 *,*::before,*::after{ box-sizing:border-box; }
-html{ scroll-behavior:smooth; }
+html{ scroll-behavior:smooth; height:100%; overflow:hidden; overscroll-behavior:none; }
 
 body{
   margin:0;
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
   background:var(--white);
   color:var(--black);
   font-family:var(--font-body);
   font-weight:300;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
-  overflow-x:hidden;
 }
 
 img{ max-width:100%; display:block; }
@@ -638,37 +640,49 @@ img{ max-width:100%; display:block; }
 /* Reemplazar por: images/qr-code.png (QR apuntando a hermesmusicclub.mx) */
 .final-meta .qr-box img{ width:100%; height:100%; object-fit:contain; }
 
-.group-brands{
-  background:var(--black);
-  color:rgba(255,255,255,.5);
-  padding:2.4em var(--edge) 3.2em;
-  border-top:1px solid rgba(255,255,255,.12);
-}
-.group-brands .g-label{
-  font-size:.64rem; letter-spacing:.25em; text-transform:uppercase; margin-bottom:1em; display:block;
-}
-.group-brands .g-names{
-  display:flex; flex-wrap:wrap; gap:1.6em 2.4em;
-  font-family:var(--font-body); font-size:.78rem; letter-spacing:.05em; font-weight:400;
-}
-
 /* ================================================================
-   SCROLL SNAP — cada sección avanza con un solo gesto de scroll
+   PAGER HORIZONTAL — la revista pasa de página izq/der
+   con gestos de scroll o swipe verticales (más naturales
+   en trackpad y móvil), en vez de scroll vertical normal.
    ================================================================ */
-html{
-  scroll-snap-type:y mandatory;
+.mag-viewport{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100svh;
+  overflow:hidden;
 }
-#sec-hero,
-#sec-segunda,
-#sec-duo,
-#sec-cifras,
-#sec-galeria,
-#sec-sesion,
-#sec-galeria-2,
-#sec-propuestas,
-#sec-final{
-  scroll-snap-align:start;
-  scroll-snap-stop:always;
+.mag-track{
+  display:flex;
+  flex-direction:row;
+  height:100%;
+  width:max-content;
+  transition:transform 1s var(--ease);
+  will-change:transform;
+}
+.mag-page{
+  flex:0 0 100vw;
+  width:100vw;
+  height:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  scrollbar-width:none;
+}
+.mag-page::-webkit-scrollbar{ display:none; }
+
+/* Efecto de "asentamiento": cada foto/video hace un zoom-out sutil
+   al convertirse en la página activa, como si la página tomara aire
+   al pasarla — sustituye al parallax por scroll vertical de antes. */
+.editorial-media img,
+.editorial-media video{
+  transition:transform 1.6s var(--ease);
+}
+.mag-page:not(.is-active) .editorial-media img,
+.mag-page:not(.is-active) .editorial-media video{
+  transform:scale(1.1);
 }
 
 /* ================================================================
@@ -724,9 +738,15 @@ a:focus-visible, button:focus-visible{
 </audio>
 
 <!-- ================================================================
+     CARRIL HORIZONTAL — todas las páginas viven aquí dentro
+     ================================================================ -->
+<div class="mag-viewport">
+<div class="mag-track" id="magTrack">
+
+<!-- ================================================================
      1. HERO
      ================================================================ -->
-<section class="hero" id="sec-hero" data-mh="HERO">
+<section class="hero mag-page is-active" id="sec-hero" data-mh="HERO">
   <div class="hero-media">
     <!-- Reemplazar por fotografía definitiva de la tienda -->
     <img src="images/IMG-20240202-WA0048.jpg"  alt="Interior de una tienda Hermes Music Club">
@@ -745,7 +765,7 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      2. SEGUNDA SECCIÓN — EDITORIAL
      ================================================================ -->
-<section class="editorial-block" id="sec-segunda" data-mh="LA TIENDA">
+<section class="editorial-block mag-page" id="sec-segunda" data-mh="LA TIENDA">
   <div class="editorial-media" data-parallax>
     <!-- Reemplazar por fotografía editorial de la tienda -->
     <img src="images/IMG-20240202-WA0034.jpg" alt="Instrumentos exhibidos en Hermes Music Club">
@@ -759,7 +779,7 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      3. DOS COLUMNAS — GUITARRA / PIANO
      ================================================================ -->
-<section class="duo" id="sec-duo" data-mh="GUITARRA Y PIANO">
+<section class="duo mag-page" id="sec-duo" data-mh="GUITARRA Y PIANO">
   <div class="duo-col">
     <div class="duo-col-media">
       <!-- Reemplazar por fotografía artística de guitarrista -->
@@ -787,7 +807,7 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      4. BLOQUE BLANCO — CIFRAS
      ================================================================ -->
-<section class="white-block" id="sec-cifras" data-mh="EN NÚMEROS">
+<section class="white-block mag-page" id="sec-cifras" data-mh="EN NÚMEROS">
   <div class="big-number reveal">30<span class="acc">+</span></div>
   <div class="caption reveal">Sucursales</div>
 
@@ -802,7 +822,7 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      5. GALERÍA EDITORIAL
      ================================================================ -->
-<section class="gallery-frame" id="sec-galeria" data-mh="LA GALERÍA">
+<section class="gallery-frame mag-page" id="sec-galeria" data-mh="LA GALERÍA">
   <div class="gallery-heading">
     <span class="eyebrow reveal" style="color:var(--black);opacity:.55;display:block;margin-bottom:.6em;">Nº 02 — El espacio</span>
     <h2 class="display-huge reveal" style="font-size:clamp(2.2rem,5.5vw,4rem);color:var(--black);">The Guitar Room</h2>
@@ -839,13 +859,13 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      5b. HERMES MUSIC SESSIONS — video de fondo, estilo Tiny Desk
      ================================================================ -->
-<section class="editorial-block session-block" id="sec-sesion" data-mh="LA SESIÓN">
+<section class="editorial-block session-block mag-page" id="sec-sesion" data-mh="LA SESIÓN">
   <div class="editorial-media" data-parallax>
     <!-- Video de fondo: sesión acústica tipo "Tiny Desk".
          Descarga un clip royalty-free de Pixabay, por ejemplo:
          https://pixabay.com/videos/guitarist-acoustic-guitar-139/
          (o busca "acoustic session" en pixabay.com/videos)
-         y colócalo aquí: video/sesion-acustica.mp4
+         y colócalo aquí: video/sesionacustica.mp4
          El poster usa temporalmente la foto de repuesto WA0085
          mientras el video carga o si el navegador no puede reproducirlo. -->
     <video autoplay muted loop playsinline poster="">
@@ -862,7 +882,7 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      5c. GALERÍA EDITORIAL — continuación
      ================================================================ -->
-<section class="gallery-frame" id="sec-galeria-2" data-mh="LA GALERÍA">
+<section class="gallery-frame mag-page" id="sec-galeria-2" data-mh="LA GALERÍA">
   <div class="gallery-plate">
     <div class="frame reveal-img">
       <!-- Reemplazar por: images/IMG-20240202-WA0054.jpg -->
@@ -878,7 +898,7 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      6. PROPUESTAS EDITORIALES
      ================================================================ -->
-<section class="editorial-proposals" id="sec-propuestas" data-mh="PROPUESTAS">
+<section class="editorial-proposals mag-page" id="sec-propuestas" data-mh="PROPUESTAS">
   <div class="proposals-head">
     <span class="eyebrow reveal" style="display:block;margin-bottom:.6em;">Nº 04 — Catálogo editorial</span>
     <h2 class="display-huge reveal">Propuestas Editoriales</h2>
@@ -912,7 +932,7 @@ a:focus-visible, button:focus-visible{
 <!-- ================================================================
      7. SECCIÓN FINAL
      ================================================================ -->
-<section class="editorial-block final-block" id="sec-final" data-mh="TE ESPERAMOS">
+<section class="editorial-block final-block mag-page" id="sec-final" data-mh="TE ESPERAMOS">
   <div class="editorial-media" data-parallax>
     <!-- Reemplazar por fotografía final de cierre -->
     <img src="images/IMG-20240202-WA0074.jpg" alt="Tienda Hermes Music Club esperando visitantes">
@@ -933,7 +953,8 @@ a:focus-visible, button:focus-visible{
   </div>
 </section>
 
-
+</div>
+</div>
 
 <script>
 (function(){
@@ -961,51 +982,99 @@ a:focus-visible, button:focus-visible{
   });
 
   /* ============================================================
-     PARALLAX SUTIL (secciones editoriales de fondo completo)
-     ============================================================ */
-  var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('[data-parallax] img, [data-parallax] video'));
-  var ticking = false;
-  function updateParallax(){
-    var vh = window.innerHeight;
-    parallaxEls.forEach(function(img){
-      var rect = img.parentElement.getBoundingClientRect();
-      if(rect.bottom < 0 || rect.top > vh) return;
-      var progress = (rect.top) / vh; // -1..1 aprox
-      var move = progress * 40; // desplazamiento sutil, nada exagerado
-      img.style.transform = 'translateY(' + move.toFixed(1) + 'px)';
-    });
-    ticking = false;
-  }
-  window.addEventListener('scroll', function(){
-    if(!ticking){ window.requestAnimationFrame(updateParallax); ticking = true; }
-  }, { passive:true });
-  updateParallax();
-
-  /* ============================================================
-     MASTHEAD — indicador editorial de sección / progreso
+     PAGER HORIZONTAL — motor que pasa las páginas de la revista
+     izquierda/derecha usando gestos de scroll o swipe verticales.
+     El contenido alto dentro de una página (galería, cifras,
+     propuestas) sigue permitiendo scroll normal ahí dentro; solo
+     al llegar al borde de esa página, el siguiente gesto pasa
+     a la página vecina.
      ============================================================ */
   var mastheadIndex = document.getElementById('mastheadIndex');
   var mastheadNum = document.getElementById('mastheadNum');
   var mastheadName = document.getElementById('mastheadName');
-  var sections = Array.prototype.slice.call(document.querySelectorAll('[data-mh]'));
 
-  var mhObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting){
-        var idx = sections.indexOf(entry.target) + 1;
-        mastheadNum.textContent = String(idx).padStart(2,'0');
-        mastheadName.textContent = entry.target.dataset.mh;
-      }
-    });
-  }, { threshold:0.5 });
-  sections.forEach(function(s){ mhObserver.observe(s); });
+  var track = document.getElementById('magTrack');
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.mag-page'));
+  var currentIndex = 0;
+  var transitioning = false;
+  var transitionTimer = null;
 
-  window.addEventListener('scroll', function(){
-    mastheadIndex.classList.toggle('visible', window.scrollY > window.innerHeight * 0.6);
-    var docH = document.documentElement.scrollHeight - window.innerHeight;
-    var prog = docH > 0 ? (window.scrollY / docH) * 100 : 0;
+  function currentPageEl(){ return pages[currentIndex]; }
+  function atTop(el){ return el.scrollTop <= 1; }
+  function atBottom(el){ return el.scrollTop + el.clientHeight >= el.scrollHeight - 1; }
+
+  function updateMasthead(){
+    var page = pages[currentIndex];
+    mastheadNum.textContent = String(currentIndex + 1).padStart(2, '0');
+    mastheadName.textContent = page.dataset.mh || '';
+    mastheadIndex.classList.toggle('visible', currentIndex > 0);
+    var prog = pages.length > 1 ? (currentIndex / (pages.length - 1)) * 100 : 0;
     document.querySelector('.masthead-index .track').style.setProperty('--prog', prog.toFixed(1) + '%');
+  }
+
+  function goTo(index){
+    index = Math.max(0, Math.min(pages.length - 1, index));
+    if(index === currentIndex){ return; }
+    currentIndex = index;
+    transitioning = true;
+    track.style.transform = 'translateX(-' + (index * 100) + 'vw)';
+    pages.forEach(function(p, i){ p.classList.toggle('is-active', i === index); });
+    updateMasthead();
+    clearTimeout(transitionTimer);
+    transitionTimer = setTimeout(function(){ transitioning = false; }, 1150);
+  }
+  updateMasthead();
+
+  /* Rueda del mouse / trackpad */
+  window.addEventListener('wheel', function(e){
+    if(transitioning){ e.preventDefault(); return; }
+    var el = currentPageEl();
+    if(e.deltaY > 12 && atBottom(el)){
+      e.preventDefault();
+      goTo(currentIndex + 1);
+    } else if(e.deltaY < -12 && atTop(el)){
+      e.preventDefault();
+      goTo(currentIndex - 1);
+    }
+  }, { passive:false });
+
+  /* Deslizar con el dedo (móvil) */
+  var touchStartY = 0;
+  document.addEventListener('touchstart', function(e){
+    touchStartY = e.touches[0].clientY;
   }, { passive:true });
+
+  document.addEventListener('touchend', function(e){
+    if(transitioning){ return; }
+    var endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : touchStartY;
+    var deltaY = touchStartY - endY;
+    if(Math.abs(deltaY) < 46){ return; }
+    var el = currentPageEl();
+    if(deltaY > 0 && atBottom(el)){ goTo(currentIndex + 1); }
+    else if(deltaY < 0 && atTop(el)){ goTo(currentIndex - 1); }
+  }, { passive:true });
+
+  /* Teclado: flechas, Page Up/Down */
+  document.addEventListener('keydown', function(e){
+    if(transitioning){ return; }
+    var forward = ['ArrowDown', 'ArrowRight', 'PageDown'].indexOf(e.key) !== -1;
+    var back = ['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) !== -1;
+    if(!forward && !back){ return; }
+    var el = currentPageEl();
+    if(forward && atBottom(el)){ e.preventDefault(); goTo(currentIndex + 1); }
+    else if(back && atTop(el)){ e.preventDefault(); goTo(currentIndex - 1); }
+  });
+
+  /* Los enlaces internos (ej. el botón del hero) pasan de página
+     en vez de intentar un scroll nativo que ya no aplica */
+  document.querySelectorAll('a[href^="#sec-"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      var id = this.getAttribute('href').slice(1);
+      var idx = pages.findIndex(function(p){ return p.id === id; });
+      if(idx !== -1){ goTo(idx); }
+    });
+  });
 
   /* ============================================================
      AUDIO — reproducción de la experiencia sonora
