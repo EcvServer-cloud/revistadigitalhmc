@@ -371,7 +371,8 @@ img{ max-width:100%; display:block; }
   color:var(--white);
 }
 .editorial-media{ position:absolute; inset:0; z-index:1; }
-.editorial-media img{
+.editorial-media img,
+.editorial-media video{
   width:100%; height:120%; object-fit:cover;
   position:absolute; top:-10%; left:0;
   will-change:transform;
@@ -662,11 +663,18 @@ html{
 #sec-duo,
 #sec-cifras,
 #sec-galeria,
+#sec-sesion,
+#sec-galeria-2,
 #sec-propuestas,
 #sec-final{
   scroll-snap-align:start;
   scroll-snap-stop:always;
 }
+
+/* ================================================================
+   SECCIÓN "LA SESIÓN" — video de fondo tipo Tiny Desk
+   ================================================================ */
+.session-block .editorial-copy{ max-width:640px; }
 
 /* ================================================================
    RESPONSIVE — ajustes generales
@@ -721,7 +729,7 @@ a:focus-visible, button:focus-visible{
 <section class="hero" id="sec-hero" data-mh="HERO">
   <div class="hero-media">
     <!-- Reemplazar por fotografía definitiva de la tienda -->
-    <img src="images/IMG-20240202-WA0048.jpg" alt="Interior de una tienda Hermes Music Club">
+    <img src="images/IMG-20240202-WA0031.jpg" alt="Interior de una tienda Hermes Music Club">
   </div>
   <div class="hero-content">
     <span class="eyebrow reveal">Hermes Music Club</span>
@@ -761,6 +769,7 @@ a:focus-visible, button:focus-visible{
       <span class="eyebrow reveal" style="display:block;margin-bottom:.8em;">Cuerdas</span>
       <h2 class="display-huge reveal">Siente la energía de cada acorde.</h2>
       <p class="reveal">Ven a probar nuestras guitarras.</p>
+      <a href="pdf/DISENO-PROPUESTA-GUITARRA-EPIC-II.pdf" target="_blank" rel="noopener" class="btn-editorial on-dark reveal">Ver propuesta editorial</a>
     </div>
   </div>
   <div class="duo-col">
@@ -772,7 +781,8 @@ a:focus-visible, button:focus-visible{
       <span class="eyebrow reveal" style="display:block;margin-bottom:.8em;">Teclas</span>
       <h2 class="display-huge reveal">Cada nota cuenta una historia.</h2>
       <p class="reveal">Ven a probar nuestros pianos.</p>
-   </div>
+      <a href="pdf/DISENO-PROPUESTA-TECLADO-ZEUS.pdf" target="_blank" rel="noopener" class="btn-editorial on-dark reveal">Ver propuesta editorial</a>
+    </div>
   </div>
 </section>
 
@@ -804,7 +814,7 @@ a:focus-visible, button:focus-visible{
     <div class="plate-inner">
       <div class="frame reveal-img">
         <!-- Reemplazar por: images/IMG-20240202-WA0048.jpg -->
-        <img src="images/IMG-20240202-WA0031.jpg"  alt="The Guitar Room en Hermes Music Club">
+        <img src="images/IMG-20240202-WA0048.jpg" alt="The Guitar Room en Hermes Music Club">
       </div>
       <div class="plate-caption reveal">
         <span class="cap-title">The Guitar Room</span>
@@ -826,6 +836,35 @@ a:focus-visible, button:focus-visible{
     </div>
   </div>
 
+</section>
+
+<!-- ================================================================
+     5b. HERMES MUSIC SESSIONS — video de fondo, estilo Tiny Desk
+     ================================================================ -->
+<section class="editorial-block session-block" id="sec-sesion" data-mh="LA SESIÓN">
+  <div class="editorial-media" data-parallax>
+    <!-- Video de fondo: sesión acústica tipo "Tiny Desk".
+         Descarga un clip royalty-free de Pixabay, por ejemplo:
+         https://pixabay.com/videos/guitarist-acoustic-guitar-139/
+         (o busca "acoustic session" en pixabay.com/videos)
+         y colócalo aquí: video/sesion-acustica.mp4
+         El poster usa temporalmente la foto de repuesto WA0085
+         mientras el video carga o si el navegador no puede reproducirlo. -->
+    <video autoplay muted loop playsinline poster="images/IMG-20240202-WA0085.jpg">
+      <source src="video/sesion-acustica.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="editorial-copy">
+    <span class="eyebrow reveal">Nº 03 — Hermes Music Sessions</span>
+    <p class="display-huge reveal" style="font-size:clamp(2.1rem,5.6vw,4.2rem);">Cerca. En vivo. Sin filtros.</p>
+    <p class="reveal" style="font-size:.95rem;color:rgba(255,255,255,.9);max-width:40ch;margin-top:.9em;text-shadow:0 2px 10px rgba(0,0,0,.5);">Una sesión acústica, como estar ahí.</p>
+  </div>
+</section>
+
+<!-- ================================================================
+     5c. GALERÍA EDITORIAL — continuación
+     ================================================================ -->
+<section class="gallery-frame" id="sec-galeria-2" data-mh="LA GALERÍA">
   <div class="gallery-plate">
     <div class="frame reveal-img">
       <!-- Reemplazar por: images/IMG-20240202-WA0054.jpg -->
@@ -843,7 +882,7 @@ a:focus-visible, button:focus-visible{
      ================================================================ -->
 <section class="editorial-proposals" id="sec-propuestas" data-mh="PROPUESTAS">
   <div class="proposals-head">
-    <span class="eyebrow reveal" style="display:block;margin-bottom:.6em;">Nº 03 — Catálogo editorial</span>
+    <span class="eyebrow reveal" style="display:block;margin-bottom:.6em;">Nº 04 — Catálogo editorial</span>
     <h2 class="display-huge reveal">Propuestas Editoriales</h2>
     <p class="reveal">Diseños desarrollados para Hermes Music Club.</p>
   </div>
@@ -934,7 +973,7 @@ a:focus-visible, button:focus-visible{
   /* ============================================================
      PARALLAX SUTIL (secciones editoriales de fondo completo)
      ============================================================ */
-  var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('[data-parallax] img'));
+  var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('[data-parallax] img, [data-parallax] video'));
   var ticking = false;
   function updateParallax(){
     var vh = window.innerHeight;
@@ -997,7 +1036,7 @@ a:focus-visible, button:focus-visible{
   }
 
   function tryAutoplay(){
-    audio.volume = 0.75;
+    audio.volume = 0.85;
     var playPromise = audio.play();
     if(playPromise !== undefined){
       playPromise.then(function(){
